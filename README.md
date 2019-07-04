@@ -75,6 +75,26 @@ Once the networks are removed, the `make dev` command should work.
 Source: https://github.com/maxking/docker-mailman/issues/85#issuecomment-349429246
 
 
+# Change the remote URL of your project's Git repo
+If you want to add this project to your own Git account, you can create a new repo in your account and then change this repo's remote URL. See [Changing a remote's URL](https://help.github.com/en/articles/changing-a-remotes-url) for details.
+
+For example, you might do something like this:
+
+```
+$ git remote -v
+> origin  git@github.com:SamuelEarl/starter-kit-docker-vue-node-neo4j.git (fetch)
+> origin  git@github.com:SamuelEarl/starter-kit-docker-vue-node-neo4j.git (push)
+
+$ git remote set-url origin git@github.com:<YourUserName>/speaker-submission-page.git
+
+$ git remote -v
+> origin  git@github.com:<YourUserName>/speaker-submission-page.git (fetch)
+> origin  git@github.com:<YourUserName>/speaker-submission-page.git (push)
+
+$ git add -A
+$ git commit -m "Add project to my account"
+$ git push -u origin master
+```
 
 # The Makefile and `make` commands
 The Makefile is configured with a list of commands to start and stop your Docker containers using Docker Compose. Docker Compose commands can get a bit long and complicated, but configuring `make` commands can make them easier to work with. The Makefile is heavily commented with explanations for each command, so you can read those comments to get familiar with the commands.
@@ -82,6 +102,7 @@ The Makefile is configured with a list of commands to start and stop your Docker
 The commands under the DEVELOPMENT heading all work, but the commands under the other headings might still need some tweaking to make sure they work properly. I will update this repo to make sure that all of the commands work properly in the future.
 
 Whenever you need to execute a `make` command, navigate to the project root folder (where the `Makefile` is located) and run the `make` command. For example, to start my project in development mode (which has live reloading configured inside of Docker containers), I would navigate to my project root and run `make dev`. You can read the comments in the Makefile for more details about that command.
+
 
 # Neo4j Database
 
