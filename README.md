@@ -31,7 +31,8 @@ Go to the [Git documentation website](https://git-scm.com/book/en/v2/Getting-Sta
     2. If you are using VS Code, you can also click on the Docker tab in the left column, expand the "Containers" menu, right-click the container whose terminal you want to access (Hint: You need to access the app container; not the database container) and then select "Attach Shell" in the context menu. That will open an interactive terminal for that container in the VS Code terminal window.
 3. Create the Vue app with `vue create .`
     * NOTE: The dot after `vue create` is important. It tells Vue to create the project in the current project directory instead of in a new child directory.
-4. Now you can install packages (i.e., dependencies), create folders and files, reorganize folders and files, change configurations, and start coding.
+4. Add the `dev` script back into your `package.json` file. When you ran the `vue create .` command, Vue CLI created a new `package.json` file that overwrote your previous `package.json` file. There wasn't much in the previous file and all we need from it is the `dev` script. So at the top of the `scripts` object add `"dev": "node server.js",` (remember the comma at the end of the line).
+5. Now you can install packages (i.e., dependencies), create folders and files, reorganize folders and files, change configurations, and start coding.
 
 
 ## Note about accessing your app container
@@ -45,9 +46,10 @@ You will probably run into permissions issues when installing things through Doc
 When you create a new project inside a Docker container, the files and folders are created with root privileges. So we need to change those permissions to be able to work with the files.
 
 1. When you first access your app container, you will be in the `/usr/src/app` directory. You need to navigate one directory up to the `/usr/src/` directory by running `cd ..`
-2. Change the permissions of the app directory recursively (i.e., change the permissions for all the folders and files inside the app directory): `chmod -R 0777 app`
-3. Now change the permissions of just the app directory (not any of the folders or files inside it) back to its original permissions level: `chmod 0775 app`
-4. The `node_modules` directory will still have root privileges, which means that you won't be able to install any new packages. So delete the `node_modules` directory. Don't worry, you can delete your `node_modules` directory anytime as long as your `package.json` file exists. The `package.json` file records all of the packages that are used in your project and you can restore your `node_modules` directory by running `npm install` in your root directory where your `package.json` file is located. Go ahead and run `npm install` now.
+2. Change the permissions of the `app` directory recursively (i.e., change the permissions for all the folders and files inside the `app` directory): `chmod -R 0777 app`
+3. Now change the permissions of just the `app` directory (not any of the folders or files inside it) back to its original permissions level: `chmod 0775 app`
+
+NOTE: The `node_modules` directory will still have root privileges, which is a good thing. That means that you won’t be able to install any new packages outside of Docker. You can refer to the heading "How to properly install NPM packages when developing with Docker" (below) to find out how to install packages or restore the `node_modules` directory using a Docker development environment.
 
 That's it. Now you should be able to work with all your folders and files.
 
@@ -55,9 +57,10 @@ That's it. Now you should be able to work with all your folders and files.
 # How to properly install NPM packages when developing with Docker
 Whenever you need to install NPM packages, you should do it inside your Docker container. This will ensure that the packages that are being installed are the correct versions that the OS in your Docker container needs in order to run properly.
 
-Access the container that has the Node app inside. (See the instructions under "Setup your project" on how to do that.) Make sure that you are in your project root (where your `package.json` file is located) before you install any packages.
+Access the container that has the Node app inside. (See the instructions under "Setup your project" on how to do that.) Make sure that you are in the `/usr/src/app` directory (where your `package.json` file is located) before you install any packages inside your Docker container. If you need to run `npm install` to restore the `node_modules` directory, then you would run that command in this directory too.
 
-After you have installed the packages in your Docker container, you may have to stop and restart your Docker container so that the packages will be recognized by your app. For example, `Ctrl` + `C` (to stop the container) followed by `make dev` (to restart the container).
+
+After you have installed the packages in your Docker container, you may have to stop and restart your Docker containers so that the packages will be recognized by your app. You would press `Ctrl` + `C` in your terminal (to stop the containers), then enter `make dev` (to start the containers again).
 
 
 # Troubleshooting: `ERROR: Pool overlaps with other one on this address space`
@@ -85,13 +88,14 @@ Whenever you need to execute a `make` command, navigate to the project root fold
 ## How to access Neo4j Browser
 Once the Neo4j container is running, you can access Neo4j Browser:
 
-* URL: `http://172.28.1.2:7474/browser/`
+* URL: [http://172.28.1.2:7474/browser/](http://172.28.1.2:7474/browser/)
 * USER: `neo4j`
 * PASSWORD: `bitnami`
 
 NOTES:
 * The IP address in the URL (`172.28.1.2`) is the one that is configured in the `docker-compose.dev.yml` file.
-* The password is the default password provided by the Bitnami Neo4j image.
+* The `neo4j` user is the default user provided by the Bitnami Neo4j image.
+* The `bitnami` password is the default password provided by the Bitnami Neo4j image.
 
 
 ## Where are the Neo4j data stored on the host machine?
