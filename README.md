@@ -25,20 +25,20 @@ Go to the [Git documentation website](https://git-scm.com/book/en/v2/Getting-Sta
 
 # Setup your project
 1. Run `make dev` to run the Docker containers.
-    * NOTE: If you get the following error: `ERROR: Pool overlaps with other one on this address space`, then refer to the heading below titled “Troubleshooting: `ERROR: Pool overlaps with other one on this address space`”.
+    * NOTE: If you get the following error: `ERROR: Pool overlaps with other one on this address space`, then refer to the heading below titled "Troubleshooting: `ERROR: Pool overlaps with other one on this address space`".
 2. Access the container that has the Node app inside. There are two ways to do that:
     1. Open a new terminal and run `docker container ls` to see the name of your app container. Then run `docker container exec -it <container_name> bash`. That will open an interactive terminal for that container in the terminal window.
-    2. If you are using VSCode, you can also click on the Docker tab in the left column, expand the “Containers” menu, right-click the container whose terminal you want to access and then select "Attach Shell" in the context menu. That will open an interactive terminal for that container in the VSCode terminal window.
+    2. If you are using VS Code, you can also click on the Docker tab in the left column, expand the "Containers" menu, right-click the container whose terminal you want to access (Hint: You need to access the app container; not the database container) and then select "Attach Shell" in the context menu. That will open an interactive terminal for that container in the VS Code terminal window.
 3. Create the Vue app with `vue create .`
     * NOTE: The dot after `vue create` is important. It tells Vue to create the project in the current project directory instead of in a new child directory.
 4. Now you can install packages (i.e., dependencies), create folders and files, reorganize folders and files, change configurations, and start coding.
 
 
 ## Note about accessing your app container
-The default command for your app container (in Dockerfile.dev) is `npm run dev`. That command will run the "dev" script that is configured in your `package.json` file. If you do not configure the "dev" script or if you do not have a `server.js` file configured, then your app container will get created and run for a moment and then it will exit. So you won't be able to access your app container's terminal to install packages and configure your project. However, if you have configured your "dev" script to run `node server.js` and if you your `server.js` file is configured to run a Node server, then your app container will get created and it will stay running because it has a process to run (i.e., there is a Node server to run). At that point you can access your app container's terminal and install packages and configure your project.
+The default command for your app container (in Dockerfile.dev) is `npm run dev`. That command will run the "dev" script that is configured in your `package.json` file. If you do not configure the "dev" script or if you do not have a `server.js` file configured, then your app container will get created and run for a moment and then it will exit. So you won't be able to access your app container's terminal to install packages and configure your project. However, if you have configured your "dev" script to run `node server.js` and if your `server.js` file is configured to run a Node server, then your app container will get created and it will stay running because it has a process to run (i.e., there is a Node server to run). At that point you can access your app container's terminal and install packages and configure your project.
 
 ## You will probably run into permissions issues
-You will probably run into permissions issues when installing things through Docker. For example, you won’t be able to make changes to folders or files. If this is the case, then you will need to change permissions to the folders and files in your project. See the next heading for details.
+You will probably run into permissions issues when installing things through Docker. For example, you won't be able to make changes to folders or files. If this is the case, then you will need to change permissions to the folders and files in your project. See the next heading for details.
 
 
 # Change permissions to folders and files in your project
@@ -47,9 +47,9 @@ When you create a new project inside a Docker container, the files and folders a
 1. When you first access your app container, you will be in the `/usr/src/app` directory. You need to navigate one directory up to the `/usr/src/` directory by running `cd ..`
 2. Change the permissions of the app directory recursively (i.e., change the permissions for all the folders and files inside the app directory): `chmod -R 0777 app`
 3. Now change the permissions of just the app directory (not any of the folders or files inside it) back to its original permissions level: `chmod 0775 app`
-4. The `node_modules` directory will still have root privileges, which means that you won’t be able to install any new packages. So delete the `node_modules` directory. Don’t worry, you can delete your `node_modules` directory anytime as long as your `package.json` file exists. The `package.json` file records all of the packages that are used in your project and you can restore your `node_modules` directory by running `npm install` in your root directory where your `package.json` file is located. Go ahead and run `npm install` now.
+4. The `node_modules` directory will still have root privileges, which means that you won't be able to install any new packages. So delete the `node_modules` directory. Don't worry, you can delete your `node_modules` directory anytime as long as your `package.json` file exists. The `package.json` file records all of the packages that are used in your project and you can restore your `node_modules` directory by running `npm install` in your root directory where your `package.json` file is located. Go ahead and run `npm install` now.
 
-That’s it. Now you should be able to work with all your folders and files.
+That's it. Now you should be able to work with all your folders and files.
 
 
 # How to properly install NPM packages when developing with Docker
@@ -61,11 +61,11 @@ After you have installed the packages in your Docker container, you may have to 
 
 
 # Troubleshooting: `ERROR: Pool overlaps with other one on this address space`
-After running `make dev`, if you get the following error: `ERROR: Pool overlaps with other one on this address space`, then it means that you have an existing Docker network on your computer that is conflicting with the Docker network that you are currently trying to create. To remove those networks, run `docker network prune`.
+After running `make dev`, if you get the following error: `ERROR: Pool overlaps with other one on this address space`, then it means that you have an existing Docker network on your computer that is conflicting with the Docker network that you are currently trying to create. To remove those networks, run `docker network prune` and enter `y` to remove the networks.
 
 At this point, if `make dev` still does not work, then it might be because you still have existing containers that are still using the network. So you need to remove the containers first, then you can run `docker network prune`. There are two ways to do this:
   1. In a terminal, you can remove more than one container at a time by specifying all of the container IDs that you want to remove. For example: `docker container rm a2156a29aa67 6a8a824a99b7`
-  2. If you are using VSCode, then you can click on the Docker tab in the left column, expand the “Containers” menu, right-click the container that you need to delete, and select “Remove Container” from the context menu.
+  2. If you are using VS Code, then you can click on the Docker tab in the left column, expand the "Containers" menu, right-click the container that you need to delete, and select "Remove Container" from the context menu.
 
 Once the networks are removed, the `make dev` command should work.
 
