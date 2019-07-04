@@ -1,0 +1,50 @@
+# In order to get the app and the database to communicate with each other, you have to setup static IP addresses on each container. Then, when registering Neo4j with hapi in hapi’s `server.js` file, you reference the static IP that you set for Neo4j in this file.
+
+version: "3.7"
+
+services:
+  dev-app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    volumes:
+      - .:/usr/src/app
+      # The following line causes the node_modules directory in your container to be populated with the packages for each dependency and the node_modules directory on your local machine to remain empty. This ensures that the packages that are installed inside the container will not be overridden by your local project files.
+      - /usr/src/app/node_modules
+    ports:
+      - 8080:8080
+      - 9229:9229 # These ports are used for debugging
+    # You have to run `npm install` to install the dependencies and `npm run dev` to start the app.
+    # You have to use bash to execute the command otherwise you will get errors.
+    command: bash -c "npm install && npm run dev"
+    networks:
+      app_net:
+        ipv4_address: 172.28.1.1
+    depends_on:
+      - dev-neo4j
+
+  dev-neo4j:
+    image: bitnami/neo4j:3.5.3
+    ports:
+      - "7474:7474"
+      - "7473:7473"
+      - "7687:7687"
+    # Volumes allow you to persist data. See the README to find out where the Neo4j data are stored on the host machine.
+    volumes:
+      - type: volume
+        source: neo4j_data_dev
+        target: /bitnami
+    networks:
+      app_net:
+        ipv4_address: 172.28.1.2
+
+volumes:
+  neo4j_data_dev:
+    driver: local
+
+networks:
+  app_net:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.28.0.0/16

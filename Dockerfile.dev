@@ -1,0 +1,15 @@
+FROM node:10
+
+WORKDIR /usr/src/app
+
+# Optionally copy package.json and package-lock.json files, if they exist
+COPY package*.json* ./
+
+# Install Vue CLI
+RUN npm install -g @vue/cli
+
+RUN npm install
+
+COPY . .
+
+CMD [ "npm", "run", "dev" ]
